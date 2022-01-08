@@ -6,12 +6,15 @@ import PingMe.app.repo.ServerRepo;
 import PingMe.app.service.ServerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Collection;
+import java.util.Random;
 
 import static PingMe.app.enumeration.Status.SERVER_DOWN;
 import static PingMe.app.enumeration.Status.SERVER_UP;
@@ -24,7 +27,7 @@ public class ServerServiceImpl implements ServerService {
     private final ServerRepo serverRepo;
     @Override
     public Server create(Server server) {
-        log.info("Zapisuje nowy serwer: {}", server.getName())
+        log.info("Zapisuje nowy serwer: {}", server.getName());
         server.setImageUrl(setServerImageUrl());
         return serverRepo.save(server);
     }
@@ -41,25 +44,31 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public Collection<Server> list(int limit) {
-        return null;
+        log.info("Ladowanie hostow");
+        return serverRepo.findAll(PageRequest.of(0, limit)).toList();
     }
 
     @Override
     public Server get(Long id) {
-        return null;
+        log.info("Ladowanie hosta po id: {}", id);
+        return serverRepo.findById(id).get();
     }
 
     @Override
     public Server update(Server server) {
-        return null;
+        log.info("Updatuje server: {}", server.getName());
+        return serverRepo.save(server);
     }
 
     @Override
     public Boolean delete(Long id) {
-        return null;
+        log.info("Usuwam hosta: {}", id);
+        serverRepo.deleteById(id);
+        return true;
     }
 
     private String setServerImageUrl() {
-        return null;
+        String[] imageNames = { "server1.png", "server2.png", "server3.png"};
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/server/image" + imageNames[new Random().nextInt(3)]).toUriString();
     }
 }
