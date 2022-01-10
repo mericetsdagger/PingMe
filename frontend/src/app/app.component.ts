@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
       .pipe(
         map(response => {
           this.dataSubject.next(response);
-          return { dataState: DataState.LOADED_STATE, appData: response }
+          return { dataState: DataState.LOADED_STATE, appData: { ...response, data: { servers: response.data.servers.reverse()} } }
         }),
         startWith({ dataState: DataState.LOADING_STATE }),
         catchError((error: string) => {
@@ -89,6 +89,22 @@ export class AppComponent implements OnInit {
         startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
         catchError((error: string) => {
           this.isLoading.next(false);
+          return of({ dataState: DataState.ERROR_STATE, error });
+        })
+      );
+  }
+
+  deleteServer(server: Server): void {
+    this.appState$ = this.serverService.delete$(server.id)
+      .pipe(
+        map(response => {
+          this.dataSubject.next(
+            { ...response, data: { servers: this.dataSubject.value.data.servers.filter(s => s.id !== server.id )}}
+          );
+          return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
+        }),
+        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
+        catchError((error: string) => {
           return of({ dataState: DataState.ERROR_STATE, error });
         })
       );
