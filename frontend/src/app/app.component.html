@@ -8,15 +8,16 @@
             <h2>Home Monitoring</h2>
           </div>
           <div class="col-sm-6">
-            <button (click)="printReport()" type="button" class="btn btn-primary">Print Report</button>
-            <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal">
+            <button (click)="printReport()" type="button" class="btn btn-primary" style="height: 40px;">Print Report</button>
+            
+            <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal" style="height: 40px;">
               <i class="material-icons">&#xE147;</i>
               <span>New Server</span>
             </a>
 
             <span>
               <!--(ngModelChange)="filterServers($event)" do poprawy-->
-              <select ngModel="ALL" name="status" class="btn btn-info" style="height: 32.91px;">
+              <select ngModel="ALL" name="status" class="btn btn-info" style="height: 40px;">
                 <option value="ALL">ALL</option>
                 <option value="SERVER_UP">SERVER UP</option>
                 <option value="SERVER_DOWN">SERVER DOWN</option>
