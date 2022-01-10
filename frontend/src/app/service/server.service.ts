@@ -12,11 +12,6 @@ export class ServerService {
   private readonly apiUrl = 'http://localhost:8080';
   constructor(private http: HttpClient) { }
 
-
-  // getServers(): Observable<CustomResponse> {
-  //   return this.http.get<CustomResponse>('http://localhost:8080/server/list');
-  // }
-
   servers$ = <Observable<CustomResponse>> this.http.get<CustomResponse>(`${this.apiUrl}/server/list`)
   .pipe(
     tap(console.log),
