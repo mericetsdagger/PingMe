@@ -6,6 +6,7 @@ import { Status } from './enum/status.enum';
 import { AppState } from './interface/app-state';
 import { CustomResponse } from './interface/custom-response';
 import { Server } from './interface/server';
+import { NotificationService } from './service/notification.service';
 import { ServerService } from './service/server.service';
 
 @Component({
@@ -24,7 +25,7 @@ export class AppComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
 
-  constructor(private serverService: ServerService) {
+  constructor(private serverService: ServerService, private notifier: NotificationService) {
 
   }
 
@@ -33,10 +34,12 @@ export class AppComponent implements OnInit {
       .pipe(
         map(response => {
           this.dataSubject.next(response);
+          this.notifier.onDefault(response.message);
           return { dataState: DataState.LOADED_STATE, appData: { ...response, data: { servers: response.data.servers.reverse()} } }
         }),
         startWith({ dataState: DataState.LOADING_STATE }),
         catchError((error: string) => {
+          this.notifier.onError(error);
           return of({ dataState: DataState.ERROR_STATE, error });
         })
       );
@@ -50,11 +53,13 @@ export class AppComponent implements OnInit {
           const index =  this.dataSubject.value.data.servers.findIndex(server => server.id === response.data.server.id);
           this.dataSubject.value.data.servers[index] = response.data.server;
           this.filterSubject.next('');
+          this.notifier.onDefault(response.message);
           return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
         }),
         startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
         catchError((error: string) => {
           this.filterSubject.next('');
+          this.notifier.onError(error);
           return of({ dataState: DataState.ERROR_STATE, error });
         })
       );
@@ -68,6 +73,7 @@ export class AppComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
         catchError((error: string) => {
+          this.notifier.onError(error);
           return of({ dataState: DataState.ERROR_STATE, error });
         })
       );
@@ -84,11 +90,13 @@ export class AppComponent implements OnInit {
           document.getElementById('closeModal').click();
           this.isLoading.next(false);
           serverForm.resetForm({ status: this.Status.SERVER_DOWN })
+          this.notifier.onDefault(response.message);
           return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
         }),
         startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
         catchError((error: string) => {
           this.isLoading.next(false);
+          this.notifier.onError(error);
           return of({ dataState: DataState.ERROR_STATE, error });
         })
       );
@@ -101,16 +109,19 @@ export class AppComponent implements OnInit {
           this.dataSubject.next(
             { ...response, data: { servers: this.dataSubject.value.data.servers.filter(s => s.id !== server.id )}}
           );
+          this.notifier.onDefault(response.message);
           return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
         }),
         startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
         catchError((error: string) => {
+          this.notifier.onError(error);
           return of({ dataState: DataState.ERROR_STATE, error });
         })
       );
   }
 
   printReport(): void {
+    this.notifier.onDefault('Report downloaded');
     let dataType = 'application/vnd.ms-excel.sheet.macroEnable.12';
     let tableSelect = document.getElementById('servers');
     let tableHtml = tableSelect.outerHTML.replace(/ /g, '%20');
