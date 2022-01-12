@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http'
 import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
+import { NotifierModule } from 'angular-notifier';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,7 @@ import { FormsModule } from '@angular/forms';
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    NotifierModule,
     FormsModule
   ],
   providers: [],
